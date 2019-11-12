@@ -11,7 +11,7 @@ const subtractValues = [8, 10];
 // const addValues = [6.4, 11.6, 57.6, 115.2, 172.8];
 // const subtractValues = [5, 6.4, 11.6];
 const goBelowZero = false;
-const maxLevels = 4;
+const maxLevels = 5;
 
 // let currentLevel = 1;
 // const hasFinished = false;
@@ -38,36 +38,33 @@ const addChildren = (parent, level = 1) => {
   });
 };
 
-const path = [];
-let hasFoundPath = false;
+const foundNodes = [];
 
 // eslint-disable-next-line consistent-return
 const walkTree = node => {
   if (node.result === endValue) {
-    hasFoundPath = true;
-    return node;
-  }
-
-  if (hasFoundPath) {
-    return node;
-  }
-
-  if (!node.children.length) {
-    // console.log('dead end');
-    return false;
+    foundNodes.push(node);
   }
 
   node.children.forEach(child => {
-    const response = walkTree(child);
-    // console.log(successPath);
-    // if (response === false) {
-    //   return successPath.pop();
-    // }
-    if (response) {
-      // we found the complete path
-      path.unshift(response);
-    }
-    return response;
+    walkTree(child);
+  });
+};
+
+// eslint-disable-next-line consistent-return
+const walkParents = node => {
+  if (!node.parent) {
+    return undefined;
+  }
+
+  console.log(node.parent.value);
+
+  walkParents(node.parent);
+};
+
+const printPaths = nodes => {
+  nodes.forEach(node => {
+    walkParents(node);
   });
 };
 
@@ -78,66 +75,18 @@ function App() {
 
   console.log(tree);
 
-  walkTree(tree.root, path);
+  walkTree(tree.root);
 
-  console.log('hasFoundPath', hasFoundPath);
-  console.log(path);
+  console.log('foundNodes', foundNodes);
 
   console.log('ended!');
 
-  // const elements = [
-  //   // list of graph elements to start with
-  //   {
-  //     data: { id: 'a' },
-  //   },
-  //   {
-  //     data: { id: 'b' },
-  //   },
-  //   {
-  //     data: { id: 'c' },
-  //   },
-  //   {
-  //     data: { id: 'ab', source: 'a', target: 'b' },
-  //   },
-  //   {
-  //     data: { id: 'ac', source: 'a', target: 'c' },
-  //   },
-  // ];
-  //
-  // const style = [
-  //   // the stylesheet for the graph
-  //   {
-  //     selector: 'node',
-  //     style: {
-  //       'background-color': '#666',
-  //       label: 'data(id)',
-  //     },
-  //   },
-  //
-  //   {
-  //     selector: 'edge',
-  //     style: {
-  //       width: 3,
-  //       'line-color': '#ccc',
-  //       'target-arrow-color': '#ccc',
-  //       'target-arrow-shape': 'triangle',
-  //     },
-  //   },
-  // ];
-  //
-  // const layout = {
-  //   name: 'breadthfirst',
-  // };
+  printPaths(foundNodes);
 
   return (
     <div className="App">
       <h1>Clear my Balance</h1>
-      {/* <CytoscapeComponent */}
-      {/*  elements={elements} */}
-      {/*  stylesheet={style} */}
-      {/*  layout={layout} */}
-      {/*  style={{ width: '600px', height: '600px', background: '#eeeeee' }} */}
-      {/* /> */};
+      <p>Paths found:</p>
     </div>
   );
 }
